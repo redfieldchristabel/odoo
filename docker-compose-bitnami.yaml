@@ -1,0 +1,66 @@
+version: '3.1'
+services:
+  odoo:
+    image: docker.io/bitnami/odoo:15
+    ports:
+      - '8069:8069'
+    volumes:
+      - 'odoo_data:/bitnami/odoo'
+    depends_on:
+      - db
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      # - ALLOW_EMPTY_PASSWORD=yes
+      - ODOO_DATABASE_HOST=db
+      - ODOO_DATABASE_PORT_NUMBER=5432
+      - ODOO_DATABASE_USER=odoo
+      - ODOO_DATABASE_NAME=myodoo
+      - ODOO_SKIP_BOOTSTRAP=yes
+
+  db:
+    image: postgres:13
+    user: $DOCKER_USER
+    environment:
+      # - POSTGRES_DB=postgres
+      # - POSTGRES_PASSWORD_FILE=/run/secrets/postgresql_password
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=myodoo
+      - POSTGRES_USER=odoo
+      # - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - /etc/passwd:/etc/passwd:ro
+      # - odoo-db-data:/var/lib/postgresql/data/pgdata
+    # secrets:
+    #   - postgresql_password
+volumes:
+  # postgresql_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: ./config
+  odoo_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./odoo
+  # odoo-web-data:
+  # odoo-db-data:
+  # odoo-config:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: ./config
+  # odoo-addons:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: ./addons
+
+# secrets:
+#   postgresql_password:
+#     file: odoo_pg_pass

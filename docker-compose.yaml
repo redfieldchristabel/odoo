@@ -1,0 +1,61 @@
+version: '3.3'
+services:
+  web:
+    image: odoo
+    # build: ./
+    # user: $DOCKER_USER
+    # command: odoo -u all -d odoo
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    volumes:
+      # - /etc/passwd:/etc/passwd
+      # - ./odoo:/var/lib/odoo/filestore
+      - odoo-web-data:/var/lib/odoo
+      # - ./config:/etc/odoo
+      # - odoo-config:/etc/odoo
+      - ./addons:/mnt/extra-addons
+      # - odoo-addons:/mnt/extra-addons
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=myodoo
+      # - PASSWORD_FILE=/run/secrets/postgresql_password
+    # secrets:
+    #   - postgresql_password
+  db:
+    image: postgres:13
+    user: $DOCKER_USER
+    environment:
+      # - POSTGRES_DB=postgres
+      # - POSTGRES_PASSWORD_FILE=/run/secrets/postgresql_password
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=myodoo
+      - POSTGRES_USER=odoo
+      # - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - /etc/passwd:/etc/passwd:ro
+      # - odoo-db-data:/var/lib/postgresql/data/pgdata
+    # secrets:
+    #   - postgresql_password
+volumes:
+  # odoo-web-data:
+  # odoo-db-data:
+  # odoo-config:
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: ./config
+  odoo-web-data: 
+    # driver: ''
+    # driver_opts:
+    #   type: none
+    #   o: bind
+    #   device: ./odoo
+
+# secrets:
+#   postgresql_password:
+#     file: odoo_pg_pass
